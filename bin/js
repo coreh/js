@@ -1,0 +1,67 @@
+#!/usr/bin/env node
+
+var fs = require('fs');
+var path = require('path');
+var program = require('commander');
+
+program
+  .version(JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8')).version)
+  .usage('<javascript>')
+  .option('-r, --raw', 'do not attempt to convert data from JSON')
+  .parse(process.argv);
+
+var stdin = "";
+
+if (!process.stdin.isTTY) {
+  process.stdin.resume();
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data', function(chunk) {
+    stdin += chunk;
+  })
+  process.stdin.on('end', start);
+} else {
+  start();
+}
+
+function start() {
+  if (!program.raw) {
+    // attempt to interpret stdin as JSON
+    try {
+      stdin = JSON.parse(stdin);
+    } catch (e) {
+      // ignore
+    }
+  }
+  
+  // expose environment variables as globals preceded with $
+  for (var name in process.env) {
+    var value = process.env[name];
+
+    if (!program.raw) {
+      // attempt to interpret variable as JSON
+      try {
+        value = JSON.parse(value);
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    global['$' + name] = value;
+  }
+    
+  var result = eval('(' + (program.args.join(' ') || 'undefined') + ')');
+  
+  if (typeof result == 'string') {
+    if (result[result.length - 1] != '\n') {
+      result = result + '\n';
+    }
+  } else {
+    try {
+      result = JSON.stringify(result, null, 2) + '\n';
+    } catch (e) {
+      // ignore
+    }
+  }
+  
+  process.stdout.write(result);
+}

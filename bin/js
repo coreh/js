@@ -8,6 +8,7 @@ program
   .version(JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8')).version)
   .usage('<javascript>')
   .option('-r, --raw', 'do not attempt to convert data from JSON')
+  .option('-u, --ugly', 'ugly output (no indentation)')
   .parse(process.argv);
 
 var stdin = "";
@@ -67,7 +68,11 @@ function start() {
     }
   } else {
     try {
-      output = JSON.stringify(output, null, 2) + '\n';
+      if (program.ugly) {
+        output = JSON.stringify(output) + '\n';        
+      } else {
+        output = JSON.stringify(output, null, 2) + '\n';
+      }
     } catch (e) {
       // ignore
     }

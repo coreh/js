@@ -50,7 +50,16 @@ function start() {
   }
     
   var result, output;
-  result = output = eval('(' + (program.args.join(' ') || 'undefined') + ')');
+  
+  try {
+    result = output = eval('(' + (program.args.join(' ') || 'undefined') + ')');
+  } catch (e) {
+    if (e instanceof SyntaxError) {
+      result = output = eval(program.args.join(' ') || 'undefined');
+    } else {
+      throw e;
+    }
+  }
   
   if (typeof output == 'string') {
     if (output[output.length - 1] != '\n') {

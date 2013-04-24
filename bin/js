@@ -49,19 +49,22 @@ function start() {
     global['$' + name] = value;
   }
     
-  var result = eval('(' + (program.args.join(' ') || 'undefined') + ')');
+  var result, output;
+  result = output = eval('(' + (program.args.join(' ') || 'undefined') + ')');
   
-  if (typeof result == 'string') {
-    if (result[result.length - 1] != '\n') {
-      result = result + '\n';
+  if (typeof output == 'string') {
+    if (output[output.length - 1] != '\n') {
+      output = output + '\n';
     }
   } else {
     try {
-      result = JSON.stringify(result, null, 2) + '\n';
+      output = JSON.stringify(output, null, 2) + '\n';
     } catch (e) {
       // ignore
     }
   }
   
-  process.stdout.write(result);
+  process.stdout.write(output);
+  
+  process.exit(result ? 0 : 1);
 }

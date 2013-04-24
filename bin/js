@@ -9,6 +9,7 @@ program
   .usage('<javascript>')
   .option('-r, --raw', 'do not attempt to convert data from JSON')
   .option('-u, --ugly', 'ugly output (no indentation)')
+  .option('-s, --silent', 'do not print result to standard output')
   .parse(process.argv);
 
 var stdin = "";
@@ -78,7 +79,9 @@ function start() {
     }
   }
   
-  process.stdout.write(output);
+  if (!program.silent) {
+    process.stdout.write(output);
+  }
   
   process.exit(result ? 0 : 1);
 }

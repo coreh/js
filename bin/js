@@ -51,18 +51,29 @@ function start() {
     global['$' + name] = value;
   }
     
-  var result, output;
+  var result;
   
   try {
-    result = output = eval('(' + (program.args.join(' ') || 'undefined') + ')');
+    result = eval('(' + (program.args.join(' ') || 'undefined') + ')');
   } catch (e) {
     if (e instanceof SyntaxError) {
-      result = output = eval(program.args.join(' ') || 'undefined');
+      result = eval(program.args.join(' ') || 'undefined');
     } else {
       throw e;
     }
   }
-  
+
+  print(result);
+}
+
+function print(result) {
+  if (result != null && typeof result === 'object' && typeof result.then === 'function') {
+    result.then(print, onError);
+    return;
+  }
+
+  var output = result;
+
   if (typeof output == 'string') {
     if (output[output.length - 1] != '\n') {
       output = output + '\n';
@@ -84,4 +95,10 @@ function start() {
   }
   
   process.exit(result ? 0 : 1);
+}
+
+function onError(error) {
+  process.nextTick(function () {
+    throw error;
+  });
 }

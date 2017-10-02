@@ -84,7 +84,7 @@ function print(result) {
   } else {
     try {
       if (program.ugly) {
-        output = JSON.stringify(output) + '\n';
+        output = JSON.stringify(output);
       } else {
         output = JSON.stringify(output, null, 2) + '\n';
       }

@@ -1,7 +1,8 @@
 0.2.0 / 2017-10-02
 ==================
 
-  * Resolve thenable result before printing
+  * Resolve thenable result before printing.
+  * Resolving stdin if no args are specified.
 
 0.1.0 / 2013-04-24 
 ==================

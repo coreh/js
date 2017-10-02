@@ -53,7 +53,7 @@ function start() {
     global['$' + name] = value;
   }
     
-  var formula = program.args.join(' ') || 'undefined';
+  var formula = program.args.join(' ') || stdin || 'undefined';
   var result;
   
   try {

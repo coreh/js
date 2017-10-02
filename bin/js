@@ -52,10 +52,10 @@ function start() {
 
     global['$' + name] = value;
   }
-    
+
   var formula = program.args.join(' ') || stdin || 'undefined';
   var result;
-  
+
   try {
     result = (0, eval)('(' + formula + ')');
   } catch (e) {
@@ -84,7 +84,7 @@ function print(result) {
   } else {
     try {
       if (program.ugly) {
-        output = JSON.stringify(output) + '\n';        
+        output = JSON.stringify(output) + '\n';
       } else {
         output = JSON.stringify(output, null, 2) + '\n';
       }
@@ -92,11 +92,11 @@ function print(result) {
       // ignore
     }
   }
-  
+
   if (!program.silent) {
     process.stdout.write(output);
   }
-  
+
   process.exit(result ? 0 : 1);
 }
 

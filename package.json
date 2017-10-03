@@ -2,11 +2,15 @@
   "name": "js",
   "description": "A better `node -p`.",
   "author": "Marco Aurelio <thecoreh@gmail.com>",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "bin": {
     "js": "./bin/js"
   },
   "dependencies": {
     "commander": "~1.1.1"
-  }
+  },
+  "engines": {
+    "node": ">=0.10"
+  },
+  "engineStrict": true
 }

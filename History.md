@@ -3,6 +3,7 @@
 
   * Resolve thenable result before printing.
   * Resolving stdin if no args are specified.
+  * Redirect result streams to stdout.
 
 0.1.0 / 2013-04-24 
 ==================

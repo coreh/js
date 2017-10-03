@@ -8,5 +8,7 @@
   },
   "dependencies": {
     "commander": "~1.1.1"
-  }
+  },
+  "engines" : { "node" : ">=0.10" },
+  "engineStrict" : true
 }

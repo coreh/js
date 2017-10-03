@@ -3,6 +3,7 @@
 var fs = require('fs');
 var path = require('path');
 var program = require('commander');
+var stream = require('stream');
 
 program
   .version(JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8')).version)
@@ -75,29 +76,37 @@ function print(result) {
     return;
   }
 
-  var output = result;
+  var output = new stream.PassThrough();
 
-  if (typeof output == 'string') {
-    if (output[output.length - 1] != '\n') {
-      output = output + '\n';
-    }
+  output.on('end', function () {
+    process.exit(result ? 0 : 1);
+  });
+
+  if (!program.silent) {
+    output.pipe(process.stdout);
+  } else {
+    output.resume();
+  }
+
+  if (result instanceof stream.Readable) {
+    result.pipe(output)
   } else {
     try {
-      if (program.ugly) {
-        output = JSON.stringify(output);
+      if (typeof result == 'string') {
+        output.write(result);
+        output.write('\n');
+      } else if (program.ugly) {
+        output.write(JSON.stringify(result));
       } else {
-        output = JSON.stringify(output, null, 2) + '\n';
+        output.write(JSON.stringify(result, null, 2));
+        output.write('\n');
       }
     } catch (e) {
       // ignore
+    } finally {
+      output.end();
     }
   }
-
-  if (!program.silent) {
-    process.stdout.write(output);
-  }
-
-  process.exit(result ? 0 : 1);
 }
 
 function onError(error) {

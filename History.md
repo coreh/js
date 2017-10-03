@@ -4,6 +4,7 @@
   * Resolve thenable result before printing.
   * Resolving stdin if no args are specified.
   * Redirect result streams to stdout.
+  * Do not hide stringifying errors.
 
 0.1.0 / 2013-04-24 
 ==================

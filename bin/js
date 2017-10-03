@@ -82,6 +82,8 @@ function print(result) {
     process.exit(result ? 0 : 1);
   });
 
+  output.on('error', onError);
+
   if (!program.silent) {
     output.pipe(process.stdout);
   } else {
@@ -101,8 +103,8 @@ function print(result) {
         output.write(JSON.stringify(result, null, 2));
         output.write('\n');
       }
-    } catch (e) {
-      // ignore
+    } catch (error) {
+      output.emit('error', error);
     } finally {
       output.end();
     }
@@ -110,7 +112,6 @@ function print(result) {
 }
 
 function onError(error) {
-  process.nextTick(function () {
-    throw error;
-  });
+  console.error(error);
+  process.exit(1);
 }

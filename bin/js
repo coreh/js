@@ -3,6 +3,7 @@
 var fs = require('fs');
 var path = require('path');
 var program = require('commander');
+var stream = require('stream');
 
 program
   .version(JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8')).version)
@@ -34,7 +35,9 @@ function start() {
       // ignore
     }
   }
-  
+  global.stdin = stdin;
+  global.require = require;
+
   // expose environment variables as globals preceded with $
   for (var name in process.env) {
     var value = process.env[name];
@@ -50,38 +53,67 @@ function start() {
 
     global['$' + name] = value;
   }
-    
-  var result, output;
-  
+
+  var formula = program.args.join(' ') || stdin || 'undefined';
+  var result;
+
   try {
-    result = output = eval('(' + (program.args.join(' ') || 'undefined') + ')');
+    result = (0, eval)('(' + formula + ')');
   } catch (e) {
     if (e instanceof SyntaxError) {
-      result = output = eval(program.args.join(' ') || 'undefined');
+      result = (0, eval)(formula);
     } else {
       throw e;
     }
   }
-  
-  if (typeof output == 'string') {
-    if (output[output.length - 1] != '\n') {
-      output = output + '\n';
-    }
+
+  print(result);
+}
+
+function print(result) {
+  if (result != null && typeof result === 'object' && typeof result.then === 'function') {
+    result.then(print, onError);
+    return;
+  }
+
+  var output = new stream.PassThrough();
+
+  output.on('end', function () {
+    process.exit(result ? 0 : 1);
+  });
+
+  output.on('error', onError);
+
+  if (!program.silent) {
+    output.pipe(process.stdout);
+  } else {
+    output.resume();
+  }
+
+  if (result instanceof stream.Readable) {
+    result.pipe(output)
   } else {
     try {
-      if (program.ugly) {
-        output = JSON.stringify(output) + '\n';        
+      if (typeof result == 'undefined') {
+        output.write('undefined\n');
+      } else if (typeof result == 'string') {
+        output.write(result);
+        output.write('\n');
+      } else if (program.ugly) {
+        output.write(JSON.stringify(result));
       } else {
-        output = JSON.stringify(output, null, 2) + '\n';
+        output.write(JSON.stringify(result, null, 2));
+        output.write('\n');
       }
-    } catch (e) {
-      // ignore
+    } catch (error) {
+      output.emit('error', error);
+    } finally {
+      output.end();
     }
   }
-  
-  if (!program.silent) {
-    process.stdout.write(output);
-  }
-  
-  process.exit(result ? 0 : 1);
+}
+
+function onError(error) {
+  console.error(error);
+  process.exit(1);
 }

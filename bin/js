@@ -94,7 +94,9 @@ function print(result) {
     result.pipe(output)
   } else {
     try {
-      if (typeof result == 'string') {
+      if (typeof result == 'undefined') {
+        output.write('undefined\n');
+      } else if (typeof result == 'string') {
         output.write(result);
         output.write('\n');
       } else if (program.ugly) {

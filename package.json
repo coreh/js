@@ -6,6 +6,10 @@
   "bin": {
     "js": "./bin/js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coreh/js.git"
+  },
   "dependencies": {
     "commander": "~1.1.1"
   }
